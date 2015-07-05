@@ -18,12 +18,27 @@
               <div class="metadata">
                   <span class="date">{{ date }} at {{ time }}</span>
               </div>
-              <div class="text">
-                  {{ text }}
-              </div>
+              <div class="text">{{ text }}</div>
           </div>
       </div>
     </script>
+
+    <div class="ui small basic modal" id="login-modal">
+      <div class="content">
+        <div class="ui one column stackable center aligned page grid">
+           <div class="column twelve wide">
+            <form class="ui form" id="login-form">
+              <div class="ui action input">
+                <input type="text" placeholder="Username" dir="auto" autocomplete="off" id="username-input" />
+                <div class="ui blue icon button" id="login-button">
+                    <i class="user icon"></i> &nbsp;Login
+                </div>
+              </div>
+             </form>
+           </div>
+        </div>
+      </div>
+    </div>
 
     <div id="container" class="ui grid">
         <div id="friends-list" class="five wide column">
@@ -79,7 +94,7 @@
             </div>
 
             <div id="message-form-container">
-                <form class="ui form">
+                <form class="ui form" id="message-form">
                     <div class="ui action input">
                         <input type="text" placeholder="Your message here..." dir="auto" autocomplete="off" id="message-box" />
                         <div class="ui green icon button" id="submit-button">

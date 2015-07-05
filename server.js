@@ -17,15 +17,17 @@ io.on('connection', function(socket) {
   });
 
   socket.on('chat message', function(message) {
-    console.log('message: ' + message);
-    data = {
-      avatar: 1,
-      name: "Jane",
-      date: "Today",
-      time: "5:34PM",
-      text: message
+    if (message !== '') {
+      console.log('message: ' + message);
+      data = {
+        avatar: 1,
+        name: "Jane",
+        date: "Today",
+        time: "5:34PM",
+        text: message
+      }
+      io.emit('chat message', data);
     }
-    io.emit('chat message', data);
   });
 });
 
