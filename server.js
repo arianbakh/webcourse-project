@@ -61,30 +61,33 @@ io.on('connection', function(socket) {
       var context = {
         username: username,
         avatar: 1
-      }
+      };
       io.to(socket.id).emit('update personal info', context);
       // TODO initialize user's page: friends list, unreceived messages
     }
   });
 
   socket.on('chat message', function(message) {
-    if (message !== '') {
+    if (message && message.hasOwnProperty('text')  && message.text !== '' && message.hasOwnProperty('from') && message.from === username && message.hasOwnProperty('to')) {
       // TODO save in database (also delivered or not)
-      console.log(username + ' said: ' + message);
+      console.log(username + ' said: ' + message.text);
       var date = new Date();
-      context = {
+      var context = {
         avatar: 2,
         name: username ? username : '???',
         date: formatDate(date),
         time: formatAMPM(date),
-        text: message
-      }
+        text: message.text
+      };
       io.to(socket.id).emit('chat message', context);
+      if (clients.hasOwnProperty(message.to)) {
+        io.to(clients[message.to]).emit('chat message', context);
+      }
       // TODO emit messages to others to both
     }
     else
     {
-      console.log('discarded empty message');
+      console.log('discarded invalid message');
     }
   });
 });

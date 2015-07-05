@@ -32,6 +32,12 @@
       </h2>
     </script>
 
+    <script id="friend-template" type="text/x-handlebars-template">
+      <a class="item friend">
+          <span>{{ username }}</span>
+      </a>
+    </script>
+
     <div class="ui small modal" id="login-modal">
       <div class="content">
         <div class="ui one column stackable center aligned page grid">
@@ -56,22 +62,13 @@
             <div class="ui vertical menu left" id="roster">
                 <div class="item">
                     <div class="ui transparent icon input">
-                        <input type="text" placeholder="Add a friend...">
+                        <input type="text" placeholder="Add a friend..." id="add-friend-input">
                         <i class="user icon"></i>
                     </div>
                 </div>
-                <a class="active green item">
-                    sadjad
+                <a class="active green item friend">
+                    <span>sadjad</span>
                     <div class="ui blue label">1</div>
-                </a>
-                <a class="blue item">
-                    johnsmith
-                </a>
-                <a class="blue item">
-                    erlich
-                </a>
-                <a class="blue item">
-                    jian.yang
                 </a>
             </div>
         </div>
