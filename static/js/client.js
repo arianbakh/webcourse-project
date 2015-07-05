@@ -34,8 +34,15 @@ $(document).ready(function() {
   $('#submit-button').click(sendMessage);
   $('#message-form').submit(sendMessage);
 
+  socket.on('update personal info', function(context) {
+    var source = $("#personal-info-template").html();
+    var template = Handlebars.compile(source);
+    var html = template(context);
+    $('#user-info').append(html);
+  });
+
   socket.on('chat message', function(context) {
-    var source   = $("#message-template").html();
+    var source = $("#message-template").html();
     var template = Handlebars.compile(source);
     var html = template(context);
     $('#messages').children().eq(0).append(html);

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Hammaal</title>
+    <title>حمال</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="stylesheet" type="text/css" href="static/semantic/semantic.min.css" />
     <link rel="stylesheet" type="text/css" href="static/css/style.css" />
@@ -21,6 +21,15 @@
               <div class="text">{{ text }}</div>
           </div>
       </div>
+    </script>
+
+    <script id="personal-info-template" type="text/x-handlebars-template">
+      <h2 class="ui icon center aligned header">
+          <img src="static/avatars/{{ avatar }}.jpg" class="ui circular image">
+          <div class="content">
+              Welcome, {{ username }}!
+          </div>
+      </h2>
     </script>
 
     <div class="ui small modal" id="login-modal">
@@ -43,13 +52,6 @@
     <div id="container" class="ui grid">
         <div id="friends-list" class="five wide column">
             <div class="ui raised stacked segment" id="user-info">
-                <h2 class="ui icon center aligned header">
-                    <img src="static/avatars/5.jpg" class="ui circular image">
-                    <div class="content">
-                        Welcome, Jane Doe!
-                        <div class="sub header">@janedoe</div>
-                    </div>
-                </h2>
             </div>
             <div class="ui vertical menu left" id="roster">
                 <div class="item">
@@ -60,9 +62,6 @@
                 </div>
                 <a class="active green item">
                     sadjad
-                </a>
-                <a class="active green item">
-                    janedoe
                     <div class="ui blue label">1</div>
                 </a>
                 <a class="blue item">
