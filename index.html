@@ -1,19 +1,99 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
+<head>
+    <meta charset="utf-8" />
     <title>Hammaal</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="js/jquery-2.1.4.min.js"></script>
-    <script src="socket.io/socket.io.js"></script>
-    <script src="js/client.js"></script>
-  </head>
-  <body>
-    <ul id="messages">
-    </ul>
-    <form action="">
-      <input id="message_box" autocomplete="off" />
-      <button id="submit_button">Send</button>
-    </form>
-  </body>
-</html>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" type="text/css" href="static/semantic/semantic.min.css" />
+    <link rel="stylesheet" type="text/css" href="static/css/style.css" />
+</head>
+<body>
+    <script id="message-template" type="text/x-handlebars-template">
+      <div class="comment">
+          <a class="avatar">
+              <img src="static/avatars/{{ avatar }}.jpg">
+          </a>
+          <div class="content">
+              <a class="author">{{ name }}</a>
+              <div class="metadata">
+                  <span class="date">{{ date }} at {{ time }}</span>
+              </div>
+              <div class="text">
+                  {{ text }}
+              </div>
+          </div>
+      </div>
+    </script>
 
+    <div id="container" class="ui grid">
+        <div id="friends-list" class="five wide column">
+            <div class="ui raised stacked segment" id="user-info">
+                <h2 class="ui icon center aligned header">
+                    <img src="static/avatars/5.jpg" class="ui circular image">
+                    <div class="content">
+                        Welcome, Jane Doe!
+                        <div class="sub header">@janedoe</div>
+                    </div>
+                </h2>
+            </div>
+            <div class="ui vertical menu left" id="roster">
+                <div class="item">
+                    <div class="ui transparent icon input">
+                        <input type="text" placeholder="Add a friend...">
+                        <i class="user icon"></i>
+                    </div>
+                </div>
+                <a class="active green item">
+                    sadjad
+                </a>
+                <a class="active green item">
+                    janedoe
+                    <div class="ui blue label">1</div>
+                </a>
+                <a class="blue item">
+                    johnsmith
+                </a>
+                <a class="blue item">
+                    erlich
+                </a>
+                <a class="blue item">
+                    jian.yang
+                </a>
+            </div>
+        </div>
+
+        <div id="messages-pane" class="eleven wide column">
+            <div id="message-header">
+                <h2 class="ui header">
+                    <i class="comments icon"></i>
+                    <div class="content">
+                        Conversation with @sadjad
+                        <div class="sub header">Online</div>
+                    </div>
+                </h2>
+            </div>
+
+            <div id="messages">
+                <div class="ui minimal comments">
+                </div>
+            </div>
+
+            <div id="message-form-container">
+                <form class="ui form">
+                    <div class="ui action input">
+                        <input type="text" placeholder="Your message here..." dir="auto" autocomplete="off" id="message-box" />
+                        <div class="ui green icon button" id="submit-button">
+                            <i class="send icon"></i> &nbsp;Send
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="static/js/jquery-2.1.4.min.js"></script>
+    <script src="static/semantic/semantic.min.js"></script>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="static/js/client.js"></script>
+    <script src="static/js/handlebars-v3.0.3.js"></script>
+</body>
+</html>
