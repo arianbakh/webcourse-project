@@ -3,9 +3,31 @@ $(document).ready(function() {
 
   $('#login-modal').modal('show');
 
+  var username = '';
+
+  function login() {
+    var value = $('#username-input').val();
+    if (value !== '') {
+      username = value;
+      socket.emit('login', value);
+      $('#username-input').val('');
+      $("#message-box").prop('disabled', false);
+      $('#login-modal').modal('hide');
+    }
+    return false;
+  }
+
+  $('#login-button').click(login);
+  $('#login-form').submit(login);
+
   function sendMessage() {
-    socket.emit('chat message', $('#message-box').val());
-    $('#message-box').val('');
+    if (username !== '') {
+      var value = $('#message-box').val();
+      if (value !== '') {
+        socket.emit('chat message', value);
+        $('#message-box').val('');
+      }
+    }
     return false;
   }
 

@@ -16,6 +16,10 @@ io.on('connection', function(socket) {
     console.log('user disconnected');
   });
 
+  socket.on('login', function(username) {
+    console.log(username + ' logged in');
+  });
+
   socket.on('chat message', function(message) {
     if (message !== '') {
       console.log('message: ' + message);
@@ -27,6 +31,10 @@ io.on('connection', function(socket) {
         text: message
       }
       io.emit('chat message', data);
+    }
+    else
+    {
+      console.log('discarded empty message');
     }
   });
 });
