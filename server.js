@@ -51,8 +51,8 @@ function saveMessage(message, callback) {
 function sendMessageToUser(message) {
   var date = new Date();
   var context = {
-    avatar: 2,  // TODO
-    name: message.from,
+    avatar: 1,  // TODO
+    from: message.from,
     date: formatDate(date),
     time: formatAMPM(date),
     text: message.text

@@ -29,9 +29,10 @@ function selectFriend () {
   $('#friend-name').html(selectedFriend);
   $('#messages-pane').show();
   // console.log(selectedFriend);
-  // TODO contact server
-  // TODO get history
-  // TODO get if the guy is online
+  // TODO NOW if there are notifications, remove them
+  // TODO NOW get if the guy is online from server
+  // TODO NOW clear messages pane
+  // TODO get history from server
 }
 
 function addFriend(e) {
@@ -40,16 +41,15 @@ function addFriend(e) {
     var value = $(this).val();
     if (value !== '') {
       var friendExists = false;
-      for (var i = 0; i < friends.length; i++)
-      {
-        if (friends[i] === value)
-        {
+      for (var i = 0; i < friends.length; i++) {
+        if (friends[i] === value) {
           friendExists = true;
           break;
         }
       }
       if (!friendExists)
       {
+        friends.push(value);
         var context = {
           username: value
         };
@@ -101,11 +101,22 @@ $(document).ready(function() {
     $('.friend').click(selectFriend);
   });
 
-  socket.on('chat message', function(context) {
-    var source = $("#message-template").html();
-    var template = Handlebars.compile(source);
-    var html = template(context);
-    $('#messages').children().eq(0).append(html);
+  socket.on('chat message', function(message) {
+    var senderIsAFriend = (message.from === username); // consider self as a friend
+    for (var i = 0; i < friends.length; i++) {
+      if (message.from === friends[i]) {
+        senderIsAFriend = true;
+        break;
+      }
+    }
+    if (senderIsAFriend) {
+      // TODO NOW if sender is the same as selected friend, append
+      // TODO NOW if sender is not the same as selected friend, add to notifications
+      var source = $("#message-template").html();
+      var template = Handlebars.compile(source);
+      var html = template(message);
+      $('#messages').children().eq(0).append(html);
+    }
   });
 });
 
