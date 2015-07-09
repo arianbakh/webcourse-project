@@ -13,7 +13,14 @@ function login() {
   var value = $('#username-input').val();
   if (value !== '') {
     username = value;
-    socket.emit('login', value);
+    socket.emit('login', value, function(context) {
+      var source = $("#personal-info-template").html();
+      var template = Handlebars.compile(source);
+      var html = template(context);
+      $('#user-info').append(html);
+      // TODO get list of friends and whether or not they have undelivered messages
+      $('.friend').click(selectFriend); // add click event for friends after initially loading them
+    });
     $('#username-input').val('');
     $("#message-box").prop('disabled', false);
     $('#login-modal').modal('hide');
@@ -36,6 +43,7 @@ function selectFriend () {
   }
 
   $('#messages').children().eq(0).children().remove(); // clear previous messages
+
   // TODO NOW get if the guy is online from server
   // TODO NOW get history from server
 }
@@ -96,15 +104,6 @@ $(document).ready(function() {
 
   $('#submit-button').click(sendMessage);
   $('#message-form').submit(sendMessage);
-
-  socket.on('update personal info', function(context) {
-    var source = $("#personal-info-template").html();
-    var template = Handlebars.compile(source);
-    var html = template(context);
-    $('#user-info').append(html);
-    // TODO get list of friends and whether or not they have undelivered messages
-    $('.friend').click(selectFriend); // add click event for friends after initially loading them
-  });
 
   socket.on('chat message', function(message) {
     var senderIsAFriend = (message.from === username); // consider self as a friend

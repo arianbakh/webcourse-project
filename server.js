@@ -61,20 +61,6 @@ function sendMessageToUser(message) {
   io.to(clients[message.to]).emit('chat message', context);
 }
 
-function saveUser(username, callback) {
-  // TODO save user on db
-  callback(username);
-}
-
-function sendUserData(username) {
-  var context = {
-    username: username,
-    avatar: 1  // TODO
-  };
-  io.to(clients[username]).emit('update personal info', context);
-  // TODO send user's page: friends list, unreceived messages
-}
-
 //////////
 // main //
 //////////
@@ -93,12 +79,17 @@ io.on('connection', function(socket) {
     }
   });
 
-  socket.on('login', function(tmpUsername) {
+  socket.on('login', function(tmpUsername, fn) {
     if (tmpUsername !== '') {
       console.log(tmpUsername + ' logged in');
       username = tmpUsername;
       clients[username] = socket.id;
-      saveUser(username, sendUserData);
+      // TODO send user's page: friends list, unreceived messages
+      var context = {
+        username: username,
+        avatar: 1  // TODO
+      };
+      fn(context);
     }
     else {
       console.log('invalid login');
