@@ -42,12 +42,6 @@ function formatDate(date) {
 /////////////////////
 // event functions //
 /////////////////////
-function saveMessage(message, callback) {
-  // TODO save message on RAM (also delivered or not -> find out from wheter or not message.to is online)
-  // TODO save message on db
-  callback(message);
-}
-
 function sendMessageToUser(message) {
   var date = new Date();
   var context = {
@@ -84,11 +78,18 @@ io.on('connection', function(socket) {
       console.log(tmpUsername + ' logged in');
       username = tmpUsername;
       clients[username] = socket.id;
-      // TODO send user's page: friends list, unreceived messages
       var context = {
         username: username,
         avatar: 1  // TODO
       };
+      // send friends
+      if (friends.hasOwnProperty(username)) {
+        context['friends'] = friends[username];
+      }
+      else {
+        context['friends'] = new Array();
+      }
+      // TODO NOW send unreceived messages
       fn(context);
     }
     else {
@@ -99,7 +100,24 @@ io.on('connection', function(socket) {
   socket.on('add friend', function(friendUsername) {
     if (username !== '') {
       if (friendUsername !== '') {
-        // TODO add to friends
+        if (friends.hasOwnProperty(username)) {
+          var friendExists = (friendUsername === username); // shouldn't add himself as a friend
+          for (var i = 0; i < friends[username].length; i++) {
+            if (friends[username][i] === friendUsername) {
+              friendExists = true;
+              break;
+            }
+          }
+          if (!friendExists) {
+            friends[username].push(friendUsername);
+          }
+        }
+        else { // user had no friends before
+          if (friendUsername !== username) { // shouldn't add himself as a friend
+            friends[username] = new Array();
+            friends[username].push(friendUsername);
+          }
+        }
       }
       else {
         console.log('discarded invalid friend for '+ username);
@@ -121,7 +139,7 @@ io.on('connection', function(socket) {
         message.hasOwnProperty('to') &&
         clients.hasOwnProperty(message.to)) {
       console.log(message.from + ' said: ' + message.text);
-      saveMessage(message, sendMessageToUser);
+      sendMessageToUser(message);
     }
     else
     {

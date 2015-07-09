@@ -9,6 +9,18 @@ function init () {
   $('#login-modal').modal('show');
 }
 
+function renderFriend(friendUsername) {
+  friends.push(friendUsername);
+  var context = {
+    username: friendUsername
+  };
+  var source = $("#friend-template").html();
+  var template = Handlebars.compile(source);
+  var html = template(context);
+  $('#roster').append(html);
+  $('#roster').children().last().click(selectFriend);
+}
+
 function login() {
   var value = $('#username-input').val();
   if (value !== '') {
@@ -18,7 +30,11 @@ function login() {
       var template = Handlebars.compile(source);
       var html = template(context);
       $('#user-info').append(html);
-      // TODO get list of friends and whether or not they have undelivered messages
+      for (var i = 0; i < context.friends.length; i++) {
+        friends.push(context.friends[i]);
+        renderFriend(context.friends[i]);
+      }
+      // TODO NOW get whether or not friends have undelivered messages
       $('.friend').click(selectFriend); // add click event for friends after initially loading them
     });
     $('#username-input').val('');
@@ -53,7 +69,7 @@ function addFriend(e) {
   {
     var value = $(this).val();
     if (value !== '') {
-      var friendExists = false;
+      var friendExists = (value === username); // shouldn't add himself as a friend
       for (var i = 0; i < friends.length; i++) {
         if (friends[i] === value) {
           friendExists = true;
@@ -62,17 +78,9 @@ function addFriend(e) {
       }
       if (!friendExists)
       {
-        friends.push(value);
-        var context = {
-          username: value
-        };
-        var source = $("#friend-template").html();
-        var template = Handlebars.compile(source);
-        var html = template(context);
-        $('#roster').append(html);
-        $('#roster').children().last().click(selectFriend);
+        renderFriend(value);
         $(this).val('');
-        // TODO contact server
+        socket.emit('add friend', value);
       }
     }
   }
