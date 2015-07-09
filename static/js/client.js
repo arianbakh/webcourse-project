@@ -3,6 +3,14 @@ var username = '';
 var selectedFriend = '';
 var friends = new Array();
 
+var window_focus;
+$(window).focus(function() {
+    window_focus = true;
+}).blur(function() {
+    window_focus = false;
+});
+
+
 function init () {
   $('#friends-list').hide();
   $('#messages-pane').hide();
@@ -160,6 +168,24 @@ $(document).ready(function() {
       }
     }
     if (senderIsAFriend) { // ignore message if it is not from friends
+      // desktop notification
+      if (!window_focus) {
+        var notificationText = message.from + ' has sent you a message!';
+        if (!("Notification" in window)) {
+          console.log("This browser does not support system notifications");
+        }
+        else if (Notification.permission === 'granted') {
+          var notification = new Notification(notificationText);
+        }
+        else if (Notification.permission !== 'denied') {
+          Notification.requestPermission(function (permission) {
+            if (permission === "granted") {
+              var notification = new Notification(notificationText);
+            }
+          });
+        }
+      }
+
       if (message.from === selectedFriend || message.from === username) { // add message to messages pane
         renderMessage(message);
         if (fn) { // the callback is not always passed for some reason
