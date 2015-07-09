@@ -29,6 +29,18 @@ function renderMessage(message) {
   $('#messages').children().eq(0).append(html);
 }
 
+function renderNotification(friendUsername, addCount) {
+  var friendElement = $('#roster a span:contains(' + friendUsername + ')').parent();
+  var notificationElement = friendElement.find('div.ui.blue.label');
+  if (notificationElement.length === 0) {
+    friendElement.append('<div class="ui blue label">' + addCount + '</div>');
+  }
+  else {
+    var notificationCount = parseInt(notificationElement.html()) + addCount;
+    notificationElement.html(notificationCount);
+  }
+}
+
 function login() {
   var value = $('#username-input').val();
   if (value !== '') {
@@ -42,7 +54,15 @@ function login() {
         friends.push(context.friends[i]);
         renderFriend(context.friends[i]);
       }
-      // TODO NOW get whether or not friends have undelivered messages
+
+      // whether or not friends have undelivered messages
+      for (var key in context.undelivered) {
+        var count = context.undelivered[key];
+        if (count > 0) {
+          renderNotification(key, count);
+        }
+      }
+
       $('.friend').unbind('click'); // so that the event won't be called multiple times
       $('.friend').click(selectFriend); // add click event for friends after initially loading them
     });
@@ -93,7 +113,12 @@ function addFriend(e) {
       {
         renderFriend(value);
         $(this).val('');
-        socket.emit('add friend', value);
+        socket.emit('add friend', value, function(undeliveredCount) {
+          // get undelivered messages from new friend
+          if (undeliveredCount > 0) {
+            renderNotification(value, undeliveredCount);
+          }
+        });
       }
     }
   }
@@ -137,21 +162,13 @@ $(document).ready(function() {
     if (senderIsAFriend) { // ignore message if it is not from friends
       if (message.from === selectedFriend || message.from === username) { // add message to messages pane
         renderMessage(message);
+        if (fn) { // the callback is not always passed for some reason
+          fn(); // mark the message as delivered (seen)
+        }
       }
       else { // add message to notifications
-        var friendElement = $('#roster a span:contains(' + message.from + ')').parent();
-        var notificationElement = friendElement.find('div.ui.blue.label');
-        if (notificationElement.length === 0) {
-          friendElement.append('<div class="ui blue label">1</div>');
-        }
-        else {
-          var notificationCount = parseInt(notificationElement.html()) + 1;
-          notificationElement.html(notificationCount);
-        }
+        renderNotification(message.from, 1);
       }
-    }
-    if (fn) { // the callback is not always passed for some reason
-      fn();
     }
   });
 });

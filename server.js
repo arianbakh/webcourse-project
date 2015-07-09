@@ -55,6 +55,7 @@ function getHistory(username, friendUsername) {
   for (var i = 0; i < messages.length; i++) {
     if ((messages[i].to === friendUsername && messages[i].from === username) || (messages[i].to === username && messages[i].from === friendUsername)) {
       history.push(messages[i]);
+      messages[i].delivered = true;
     }
   }
   history.sort(function (a, b) {
@@ -67,8 +68,14 @@ function getHistory(username, friendUsername) {
   return result;
 }
 
-function getUnreceivedMessages(username) {
-  // TODO
+function getNumberOfUnreceivedMessages(username, friendUsername) {
+  var count = 0;
+  for (var i = 0; i < messages.length; i++) {
+    if (messages[i].to === username && messages[i].from === friendUsername && messages[i].delivered === false) {
+      count++;
+    }
+  }
+  return count;
 }
 
 /////////////////////
@@ -121,16 +128,20 @@ io.on('connection', function(socket) {
       clients[username] = socket.id;
       var context = {
         username: username,
+        undelivered: {},
         avatar: 1  // TODO
       };
       // send friends
       if (friends.hasOwnProperty(username)) {
         context['friends'] = friends[username];
+        for (var i = 0; i < friends[username].length; i++) {
+          var friend = friends[username][i];
+          context['undelivered'][friend] = getNumberOfUnreceivedMessages(username, friend);
+        }
       }
       else {
         context['friends'] = new Array();
       }
-      // TODO NOW send number of unreceived messages for each friend
       fn(context);
     }
     else {
@@ -138,7 +149,7 @@ io.on('connection', function(socket) {
     }
   });
 
-  socket.on('add friend', function(friendUsername) {
+  socket.on('add friend', function(friendUsername, fn) {
     if (username !== '') {
       if (friendUsername !== '') {
         if (friends.hasOwnProperty(username)) {
@@ -150,13 +161,21 @@ io.on('connection', function(socket) {
             }
           }
           if (!friendExists) {
+            // not DRY
             friends[username].push(friendUsername);
+            if (fn) {
+              fn(getNumberOfUnreceivedMessages(username, friendUsername));
+            }
           }
         }
         else { // user had no friends before
           if (friendUsername !== username) { // shouldn't add himself as a friend
             friends[username] = new Array();
+            // not DRY
             friends[username].push(friendUsername);
+            if (fn) {
+              fn(getNumberOfUnreceivedMessages(username, friendUsername));
+            }
           }
         }
       }
