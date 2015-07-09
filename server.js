@@ -40,8 +40,31 @@ function formatDate(date) {
   return month + '/' + day;
 }
 
-function getHistory(username) {
-  // TODO
+function getMessageContext(message) {
+  return {
+    avatar: 1,  // TODO
+    from: message.from,
+    date: formatDate(message.datetime),
+    time: formatAMPM(message.datetime),
+    text: message.text
+  };
+}
+
+function getHistory(username, friendUsername) {
+  var history = new Array();
+  for (var i = 0; i < messages.length; i++) {
+    if ((messages[i].to === friendUsername && messages[i].from === username) || (messages[i].to === username && messages[i].from === friendUsername)) {
+      history.push(messages[i]);
+    }
+  }
+  history.sort(function (a, b) {
+    return (b.datetime - a.datetime) * -1; // from oldest to newest
+  });
+  var result = new Array();
+  for (var i = 0; i < history.length; i++) {
+    result.push(getMessageContext(history[i]));
+  }
+  return result;
 }
 
 function getUnreceivedMessages(username) {
@@ -63,18 +86,14 @@ function sendMessageToUser(message) {
   };
   messages.push(tmpMessage);
 
-  var context = {
-    avatar: 1,  // TODO
-    from: message.from,
-    date: formatDate(date),
-    time: formatAMPM(date),
-    text: message.text
-  };
+  var context = getMessageContext(tmpMessage);
   io.to(clients[message.from]).emit('chat message', context);
-  var toSocket = io.sockets.connected[clients[message.to]];
-  toSocket.emit('chat message', context, function () {
-    tmpMessage['delivered'] = true;
-  });
+  if (clients.hasOwnProperty(message.to)) { // don't send messages to offline/non-existing users
+    var toSocket = io.sockets.connected[clients[message.to]];
+    toSocket.emit('chat message', context, function () {
+      tmpMessage['delivered'] = true;
+    });
+  }
 }
 
 //////////
@@ -155,11 +174,10 @@ io.on('connection', function(socket) {
         message.hasOwnProperty('text') &&
         message.text !== '' &&
         message.hasOwnProperty('from') &&
-        clients.hasOwnProperty(message.to) &&
+        clients.hasOwnProperty(message.from) &&
         username &&
         message.from === username &&
-        message.hasOwnProperty('to') &&
-        clients.hasOwnProperty(message.to)) {
+        message.hasOwnProperty('to')) {
       console.log(message.from + ' said: ' + message.text);
       sendMessageToUser(message);
     }
@@ -176,7 +194,7 @@ io.on('connection', function(socket) {
     }
     var context = {
       status: status,
-      history: getHistory(username)
+      history: getHistory(username, friendUsername)
     };
     fn(context);
   });

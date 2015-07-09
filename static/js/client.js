@@ -18,7 +18,15 @@ function renderFriend(friendUsername) {
   var template = Handlebars.compile(source);
   var html = template(context);
   $('#roster').append(html);
+  $('#roster').children().last().unbind('click'); // so that the event won't be called multiple times
   $('#roster').children().last().click(selectFriend);
+}
+
+function renderMessage(message) {
+  var source = $("#message-template").html();
+  var template = Handlebars.compile(source);
+  var html = template(message);
+  $('#messages').children().eq(0).append(html);
 }
 
 function login() {
@@ -35,6 +43,7 @@ function login() {
         renderFriend(context.friends[i]);
       }
       // TODO NOW get whether or not friends have undelivered messages
+      $('.friend').unbind('click'); // so that the event won't be called multiple times
       $('.friend').click(selectFriend); // add click event for friends after initially loading them
     });
     $('#username-input').val('');
@@ -62,7 +71,9 @@ function selectFriend () {
 
   socket.emit('select friend', selectedFriend, function (context) {
     $('#status').html(context.status);
-    // TODO NOW get history from server
+    for (var i = 0; i < context.history.length; i++) {
+      renderMessage(context.history[i]);
+    }
   });
 }
 
@@ -125,10 +136,7 @@ $(document).ready(function() {
     }
     if (senderIsAFriend) { // ignore message if it is not from friends
       if (message.from === selectedFriend || message.from === username) { // add message to messages pane
-        var source = $("#message-template").html();
-        var template = Handlebars.compile(source);
-        var html = template(message);
-        $('#messages').children().eq(0).append(html);
+        renderMessage(message);
       }
       else { // add message to notifications
         var friendElement = $('#roster a span:contains(' + message.from + ')').parent();
