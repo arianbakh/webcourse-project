@@ -62,8 +62,8 @@ function selectFriend () {
 
   socket.emit('select friend', selectedFriend, function (context) {
     $('#status').html(context.status);
+    // TODO NOW get history from server
   });
-  // TODO NOW get history from server
 }
 
 function addFriend(e) {
@@ -115,7 +115,7 @@ $(document).ready(function() {
   $('#submit-button').click(sendMessage);
   $('#message-form').submit(sendMessage);
 
-  socket.on('chat message', function(message) {
+  socket.on('chat message', function(message, fn) {
     var senderIsAFriend = (message.from === username); // consider self as a friend
     for (var i = 0; i < friends.length; i++) {
       if (message.from === friends[i]) {
@@ -141,6 +141,9 @@ $(document).ready(function() {
           notificationElement.html(notificationCount);
         }
       }
+    }
+    if (fn) { // the callback is not always passed for some reason
+      fn();
     }
   });
 });

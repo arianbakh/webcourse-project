@@ -8,8 +8,9 @@ var assert = require('assert')
 var ObjectId = require('mongodb').ObjectID;
 var url = 'mongodb://localhost:27017/chat';
 
-var clients = {};
-var friends = {};
+var clients = {}; // username: socket id
+var friends = {}; // username: list of friend usernames
+var messages = new Array;
 
 app.use(express.static(__dirname));
 
@@ -39,13 +40,29 @@ function formatDate(date) {
   return month + '/' + day;
 }
 
+function getHistory(username) {
+  // TODO
+}
+
+function getUnreceivedMessages(username) {
+  // TODO
+}
+
 /////////////////////
 // event functions //
 /////////////////////
 function sendMessageToUser(message) {
-  // TODO add unreceived flag to messages
-  // TODO save messages
   var date = new Date();
+
+  var tmpMessage = {
+    to: message.to,
+    from: message.from,
+    text: message.text,
+    datetime: date,
+    delivered: false
+  };
+  messages.push(tmpMessage);
+
   var context = {
     avatar: 1,  // TODO
     from: message.from,
@@ -54,7 +71,10 @@ function sendMessageToUser(message) {
     text: message.text
   };
   io.to(clients[message.from]).emit('chat message', context);
-  io.to(clients[message.to]).emit('chat message', context);
+  var toSocket = io.sockets.connected[clients[message.to]];
+  toSocket.emit('chat message', context, function () {
+    tmpMessage['delivered'] = true;
+  });
 }
 
 //////////
@@ -91,7 +111,7 @@ io.on('connection', function(socket) {
       else {
         context['friends'] = new Array();
       }
-      // TODO NOW send unreceived messages
+      // TODO NOW send number of unreceived messages for each friend
       fn(context);
     }
     else {
@@ -155,7 +175,8 @@ io.on('connection', function(socket) {
       status = 'Online';
     }
     var context = {
-      status: status
+      status: status,
+      history: getHistory(username)
     };
     fn(context);
   });
