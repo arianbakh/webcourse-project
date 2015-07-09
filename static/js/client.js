@@ -28,11 +28,16 @@ function selectFriend () {
   $(this).addClass('active green');
   $('#friend-name').html(selectedFriend);
   $('#messages-pane').show();
-  // console.log(selectedFriend);
-  // TODO NOW if there are notifications, remove them
+
+  // if there are notifications, remove them
+  var notificationElement = $(this).find('div.ui.blue.label');
+  if (notificationElement.length !== 0) {
+    notificationElement.remove();
+  }
+
+  $('#messages').children().eq(0).children().remove(); // clear previous messages
   // TODO NOW get if the guy is online from server
-  // TODO NOW clear messages pane
-  // TODO get history from server
+  // TODO NOW get history from server
 }
 
 function addFriend(e) {
@@ -98,7 +103,7 @@ $(document).ready(function() {
     var html = template(context);
     $('#user-info').append(html);
     // TODO get list of friends and whether or not they have undelivered messages
-    $('.friend').click(selectFriend);
+    $('.friend').click(selectFriend); // add click event for friends after initially loading them
   });
 
   socket.on('chat message', function(message) {
@@ -109,13 +114,24 @@ $(document).ready(function() {
         break;
       }
     }
-    if (senderIsAFriend) {
-      // TODO NOW if sender is the same as selected friend, append
-      // TODO NOW if sender is not the same as selected friend, add to notifications
-      var source = $("#message-template").html();
-      var template = Handlebars.compile(source);
-      var html = template(message);
-      $('#messages').children().eq(0).append(html);
+    if (senderIsAFriend) { // ignore message if it is not from friends
+      if (message.from === selectedFriend || message.from === username) { // add message to messages pane
+        var source = $("#message-template").html();
+        var template = Handlebars.compile(source);
+        var html = template(message);
+        $('#messages').children().eq(0).append(html);
+      }
+      else { // add message to notifications
+        var friendElement = $('#roster a span:contains(' + message.from + ')').parent();
+        var notificationElement = friendElement.find('div.ui.blue.label');
+        if (notificationElement.length === 0) {
+          friendElement.append('<div class="ui blue label">1</div>');
+        }
+        else {
+          var notificationCount = parseInt(notificationElement.html()) + 1;
+          notificationElement.html(notificationCount);
+        }
+      }
     }
   });
 });
