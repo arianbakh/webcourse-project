@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <meta charset="utf-8" />
     <title>حمال</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <link rel="stylesheet" type="text/css" href="static/semantic/semantic.min.css" />
     <link rel="stylesheet" type="text/css" href="static/css/style.css" />
-</head>
-<body>
+  </head>
+  <body>
     <script id="message-template" type="text/x-handlebars-template">
       <div class="comment">
           <a class="avatar">
@@ -66,7 +66,7 @@
                         <i class="user icon"></i>
                     </div>
                 </div>
-                <a class="active green item friend">
+                <a class="item friend">
                     <span>sadjad</span>
                     <div class="ui blue label">1</div>
                 </a>
@@ -78,7 +78,7 @@
                 <h2 class="ui header">
                     <i class="comments icon"></i>
                     <div class="content">
-                        Conversation with @sadjad
+                        Conversation with <span id="friend-name"></span>
                         <div class="sub header">Online</div>
                     </div>
                 </h2>
@@ -104,7 +104,7 @@
     <script src="static/js/jquery-2.1.4.min.js"></script>
     <script src="static/semantic/semantic.min.js"></script>
     <script src="socket.io/socket.io.js"></script>
-    <script src="static/js/client.js"></script>
     <script src="static/js/handlebars-v3.0.3.js"></script>
-</body>
+    <script src="static/js/client.js"></script>
+  </body>
 </html>
