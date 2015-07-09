@@ -43,6 +43,8 @@ function formatDate(date) {
 // event functions //
 /////////////////////
 function sendMessageToUser(message) {
+  // TODO add unreceived flag to messages
+  // TODO save messages
   var date = new Date();
   var context = {
     avatar: 1,  // TODO
@@ -145,6 +147,17 @@ io.on('connection', function(socket) {
     {
       console.log('discarded invalid message');
     }
+  });
+
+  socket.on('select friend', function(friendUsername, fn) {
+    var status = 'Offline';
+    if (clients.hasOwnProperty(friendUsername)) {
+      status = 'Online';
+    }
+    var context = {
+      status: status
+    };
+    fn(context);
   });
 });
 

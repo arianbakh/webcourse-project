@@ -60,7 +60,9 @@ function selectFriend () {
 
   $('#messages').children().eq(0).children().remove(); // clear previous messages
 
-  // TODO NOW get if the guy is online from server
+  socket.emit('select friend', selectedFriend, function (context) {
+    $('#status').html(context.status);
+  });
   // TODO NOW get history from server
 }
 
