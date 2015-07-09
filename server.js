@@ -11,6 +11,7 @@ var url = 'mongodb://localhost:27017/chat';
 var clients = {}; // username: socket id
 var friends = {}; // username: list of friend usernames
 var messages = new Array;
+var lastOnline = {}; // username: datetime
 
 app.use(express.static(__dirname));
 
@@ -114,6 +115,7 @@ io.on('connection', function(socket) {
   socket.on('disconnect', function() {
     if (username !== '') {
       delete clients[username];
+      lastOnline[username] = new Date();
       console.log(username + ' disconnected');
     }
     else {
@@ -210,6 +212,9 @@ io.on('connection', function(socket) {
     var status = 'Offline';
     if (clients.hasOwnProperty(friendUsername)) {
       status = 'Online';
+    }
+    else if (lastOnline.hasOwnProperty(friendUsername)) {
+      status += ' (last seen at ' + formatDate(lastOnline[friendUsername]) + ' ' + formatAMPM(lastOnline[friendUsername]) + ')';
     }
     var context = {
       status: status,
